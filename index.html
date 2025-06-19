@@ -1,29 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do List</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        #todoList {
-            border-collapse: collapse;
-            width: 70%;
-            margin: 0 auto;
-        }
-        #todoList th, #todoList td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        #todoList th {
-            background-color: #f0f0f0;
-        }
-        #todoList th:first-child, #todoList th:last-child {
-            width: 5%;
-        }
+@@ -27,18 +27,12 @@
         #todoList th:nth-child(2) {
             width: 90%;
         }
@@ -39,23 +14,16 @@
         .add-form button {
             padding: 8px;
             width: 20%;
+        .delete-btn {
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: red;
         }
     </style>
 </head>
-<body>
-
-<h2 style="text-align: center;">To-Do List</h2>
-
-<table id="todoList">
-    <thead>
-        <tr>
-            <th>Number</th>
-            <th>Text</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody id="listBody">
-        {{rows}}
+@@ -59,45 +53,34 @@ <h2 style="text-align: center;">To-Do List</h2>
     </tbody>
 </table>
 
@@ -71,6 +39,19 @@
     function renderList() {
         const listBody = document.getElementById('listBody');
         listBody.innerHTML = '';
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+
+                try {
+                    const response = await fetch('/delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id })
+                    });
 
         items.forEach((item, index) => {
             const row = document.createElement('tr');
@@ -80,6 +61,17 @@
                 <td><button onclick="removeItem(${index})">Remove</button></td>
             `;
             listBody.appendChild(row);
+                    if (response.ok) {
+                        // Reload the page to show the updated list
+                        window.location.reload();
+                    } else {
+                        alert('Failed to delete item');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Failed to delete item');
+                }
+            });
         });
     }
 
@@ -98,7 +90,7 @@
         items.splice(index, 1);
         renderList();
     }
+    });
 </script>
 
 </body>
-</html>
